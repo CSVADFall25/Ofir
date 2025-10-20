@@ -25,7 +25,7 @@ const STROKE_W = 3;
 const EMOJI_TARGETS = [
   { ch: "🐟", name: "fish" },
   { ch: "⭐", name: "star" },
-  { ch: "❤️", name: "heart" },
+  { ch: "♥", name: "heart" },
   { ch: "☂️", name: "umbrella" },
   { ch: "🌙", name: "moon" },
   { ch: "🍎", name: "apple" },
