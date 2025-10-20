@@ -16,6 +16,8 @@ This project has 2 main modes:
 
 2. **Game Mode**: In this mode, users are prompted to "fish" for a specific emoji by drawing it on the pond surface. The target emoji is displayed in the thought bubble of the rightmost mushroom-chibi and users must replicate it as closely as possible using the drawing tools. Once they finish their drawing and click "done", the system evaluates their drawing against the target emoji using a pixel-based comparison method (Dice score) and then decides whether the mushroom-chibis keep or release the caught emoji based on the accuracy of the drawing. Feedback is provided through changes in the facial expressions of the rightmost mushroom-chibi.
 
+refer to Play-Through-PondSketch.mov for an example usage of both modes.
+
 ## Design Principles
 
 The design focuses on being simple, calm, and a little playful. The color palette uses soft greens and blues to make the pond feel like the center of the scene, while a few brighter accents draw attention to buttons and tools. Everything is arranged to feel balanced without crowding the space. The controls stay minimal and visual so people can figure things out just by trying them. The goal was to make a drawing tool that feels easy to explore rather than something that needs instructions.
@@ -46,3 +48,9 @@ Next, I decided to allow the user to only draw on the largest available surface 
 I had a vague idea of some way to make this into a drawing game from the very beginning, but once the initial setup was done I was able to iterate on that and expand what I am looking for. Initially, I thought about simply having the user draw a fish, but decided it would then only be a "one and done" experience. Thus, I decided to have the user "fish" for various emojis, which would allow for a more varied and replayable experience. The hardest part in this was figuring out how to evaluate the user's drawing in a way that felt fair and intuitive. After some research, I settled on using a pixel-based comparison method (Dice score) which allowed for a more forgiving evaluation that could account for the imperfections in hand-drawn art.
 
 Finally, I added UI elements to switch between drawing mode and game mode, as well as buttons to save the artwork and submit drawings in game mode. I added this because I was thinking that someone might just want to make simple linework for fun in order to lean more into the "serene" scene.
+
+## Future Work
+
+There are several areas I wanted to expand the project on. First, I was considering using LLMs to evaluate the shape but decided against it due to time constraints and the added complexity. I also wanted to find a method for it to use any random emoji rather than the hardcoded set I provided. I also wanted to potentially add a scoring mechanism to the game mode to give users more feedback on their performance like how to improve their drawing and what they got deducted points on. Finally, there are some elements of the UI that I am not 100% satisfied with, such as the eraser, no undo button, no brush size, and maybe the design of the buttons, all of which could be improved for a better user experience.
+
+[]
