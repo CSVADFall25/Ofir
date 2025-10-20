@@ -42,6 +42,11 @@ let currentStroke = [];
 let erasing = false;
 let colorNow = PALETTE[2];
 let doneButton;
+let rimGlow = 0; // 0..1 animation state
+let rimGlowSpeed = 0; // how fast it fades out
+let gameEnabled = true;
+let toggleGameBtn, saveBtn;
+let savingFrame = false; // true while saving, to skip UI
 
 let faceState = "neutral"; // neutral | happy | sad
 let faceTimer = 0;
@@ -85,6 +90,8 @@ function setup() {
   ink.clear();
 
   makeDoneButton();
+  makeGameAndSaveButtons();
+  updateUIForGameMode();
   pickNewTarget();
 }
 
@@ -92,10 +99,20 @@ function draw() {
   background("#fafafa");
 
   drawBowlAndWater();
+  // Draw pond glow feedback if active
+  if (rimGlow > 0) {
+    const alpha = map(rimGlow, 0, 1, 0, 150);
+    noFill();
+    stroke(0, 180, 255, alpha);
+    strokeWeight(10);
+    ellipse(pond.cx, pond.cy, pond.rx * 2 + 10, pond.ry * 2 + 10);
+    rimGlow = max(0, rimGlow - rimGlowSpeed);
+  }
+
   image(ink, 0, 0); // persistent strokes
   drawSubmissions(); // animated crops
   drawShelfAndObjects();
-  drawUI();
+  if (!savingFrame) drawUI();
 }
 
 // ———————————————————————————————————————————
@@ -115,6 +132,95 @@ function makeDoneButton() {
   });
   doneButton.hide();
   doneButton.mousePressed(submitDrawing);
+}
+
+// ———————————————————————————————————————————
+// Game toggle & save
+// ———————————————————————————————————————————
+function toggleGame() {
+  gameEnabled = !gameEnabled;
+  toggleGameBtn.html(gameEnabled ? "Game: On" : "Game: Off");
+
+  if (gameEnabled) {
+    // re-enable the “Done” flow and targets
+    doneButton.show();
+    pickNewTarget();
+    faceState = "neutral";
+  } else {
+    // turn off game-y bits
+    doneButton.hide();
+    subs = []; // clear any running animations
+    faceState = "neutral";
+  }
+  updateUIForGameMode();
+}
+function saveImage() {
+  // Temporarily hide UI elements
+  toggleGameBtn.hide();
+  saveBtn.hide();
+  doneButton.hide();
+  if (toggleGameBtn) toggleGameBtn.hide();
+  if (saveBtn) saveBtn.hide();
+  if (doneButton) doneButton.hide();
+
+  // Flag to skip drawing the palette + eraser icons
+  savingFrame = true;
+
+  redraw(); // draw one clean frame without UI
+  const ts = new Date().toISOString().replace(/[:.]/g, "-");
+  saveCanvas(`pond-drawing-${ts}`, "png");
+
+  // Restore
+  savingFrame = false;
+  toggleGameBtn.show();
+  saveBtn.show();
+  if (gameEnabled) doneButton.show();
+}
+
+function makeGameAndSaveButtons() {
+  // Game toggle
+  toggleGameBtn = createButton(gameEnabled ? "Game: On" : "Game: Off");
+  toggleGameBtn.position(W - 210, H - 60);
+  Object.assign(toggleGameBtn.elt.style, {
+    padding: "8px 12px",
+    fontFamily: "system-ui, sans-serif",
+    fontSize: "14px",
+    backgroundColor: "#10b981",
+    color: "#fff",
+    border: "none",
+    borderRadius: "8px",
+    cursor: "pointer",
+    marginRight: "8px",
+  });
+  toggleGameBtn.mousePressed(toggleGame);
+
+  // Save image
+  saveBtn = createButton("Save Image");
+  saveBtn.position(W - 320, H - 60);
+  Object.assign(saveBtn.elt.style, {
+    padding: "8px 12px",
+    fontFamily: "system-ui, sans-serif",
+    fontSize: "14px",
+    backgroundColor: "#374151",
+    color: "#fff",
+    border: "none",
+    borderRadius: "8px",
+    cursor: "pointer",
+  });
+  saveBtn.mousePressed(saveImage);
+}
+function updateUIForGameMode() {
+  if (gameEnabled) {
+    // Game ON: show Done, hide Save
+    if (doneButton) doneButton.show();
+    if (saveBtn) saveBtn.hide();
+    if (toggleGameBtn) toggleGameBtn.html("Game: On");
+  } else {
+    // Game OFF: hide Done, show Save
+    if (doneButton) doneButton.hide();
+    if (saveBtn) saveBtn.show();
+    if (toggleGameBtn) toggleGameBtn.html("Game: Off");
+  }
 }
 
 // ———————————————————————————————————————————
@@ -397,6 +503,7 @@ function drawSubmissions() {
 }
 
 function submitDrawing() {
+  if (!gameEnabled) return;
   doneButton.hide();
 
   // snapshot ink
@@ -514,18 +621,23 @@ function mousePressed() {
   }
   if (hitEraser(mouseX, mouseY)) {
     erasing = !erasing;
-    if (erasing) doneButton.hide();
-    else doneButton.show();
+    if (gameEnabled) {
+      if (erasing) doneButton.hide();
+      else doneButton.show();
+    }
     return;
   }
 
   if (!insidePond(mouseX, mouseY)) {
+    // trigger glow pulse
+    rimGlow = 1;
+    rimGlowSpeed = 0.04;
     currentStroke = [];
     return;
   }
 
   currentStroke = [{ x: mouseX, y: mouseY }];
-  if (!erasing) doneButton.show();
+  if (!erasing && gameEnabled) doneButton.show();
 
   if (erasing) {
     ink.erase();
@@ -643,24 +755,27 @@ function drawUI() {
     circle(ex, ey, r * 2.6);
   }
 
-  // mushroom bubble showing target emoji (no corner box)
-  const fx = pond.cx + 170,
-    fy = pond.cy - pond.ry - 10 - 52;
-  const bw = 56,
-    bh = 42;
-  fill(255, 255, 255, 230);
-  stroke("#4b5563");
-  strokeWeight(2);
-  ellipse(fx, fy, bw, bh);
-  noStroke();
-  fill("#1f2937");
-  textAlign(CENTER, CENTER);
-  textSize(28);
-  text(target?.ch || "🎣", fx, fy + 1);
+  if (gameEnabled) {
+    // mushroom bubble showing target emoji
+    const fx = pond.cx + 170,
+      fy = pond.cy - pond.ry - 10 - 52;
+    const bw = 56,
+      bh = 42;
+    fill(255, 255, 255, 230);
+    stroke("#4b5563");
+    strokeWeight(2);
+    ellipse(fx, fy, bw, bh);
 
-  if (faceState === "happy" || faceState === "sad") {
-    textSize(16);
-    text(faceState === "happy" ? "✔️" : "❌", fx + bw * 0.32, fy - bh * 0.32);
+    noStroke();
+    fill("#1f2937");
+    textAlign(CENTER, CENTER);
+    textSize(28);
+    text(target?.ch || "🎣", fx, fy + 1);
+
+    if (faceState === "happy" || faceState === "sad") {
+      textSize(16);
+      text(faceState === "happy" ? "✔️" : "❌", fx + bw * 0.32, fy - bh * 0.32);
+    }
   }
 }
 
