@@ -1,8 +1,44 @@
-html, body {
-  margin: 0;
-  padding: 0;
+/* Top controls bar */
+#controls {
+  position: fixed;
+  top: 8px;
+  left: 12px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  /* space between items */
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(6px);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  z-index: 1000;
+  /* sit above canvas */
+  font-family: ui-monospace, Menlo, Consolas, monospace;
 }
 
+#controls .label {
+  font-weight: 600;
+  margin-left: 6px;
+}
+
+#controls button {
+  padding: 8px 12px;
+  border: 1px solid #999;
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+}
+
+#controls input[type="range"] {
+  width: 220px;
+  /* slider width */
+  vertical-align: middle;
+}
+
+/* Give the canvas room so it's not under the toolbar */
 canvas {
   display: block;
+  margin-top: 64px;
+  /* roughly height of the toolbar */
 }

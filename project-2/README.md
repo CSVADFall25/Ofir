@@ -1,56 +1,56 @@
-# PondSketch Project
+# Step-Synth
 
 ## Overview
 
-"It is a quiet afternoon and 2 mushroom-chibis are sitting by a serene pond, having a picnic, surrounded by lush greenery. One mushroom-chibi, with a gentle smile, is holding a fishing rod, patiently waiting for a catch. Beside it, the ssecond mushroom-chibi looks on with wide-eyed curiosity, and decides whether the catch is worthy of their picnic or not. The scene exudes a sense of tranquility and whimsy, inviting one to pause and appreciate simple joys."
+When deciding on what data to use, I decided to go with my step count, which has personal daily goals I try to meet every single day. out of all of my health data, this is the thing I probably refer to the most, and thus I wanted to create an interactive data visualization for it. This project is an interactive data portrait built with p5.js. It visualizes daily step counts as a skyline-style bar chart with an optional overlay of weekday trend lines (Mon–Sun). It also includes a playful “remix” mode that sonifies those weekday trends with seven oscillators, turning routine activity into a synth sketch.
 
-This project is an interactive drawing experience built with p5.js, centered around the serene pond scene described above.
-
-The goal was to create a visually engaging and relaxing environment that encourages creativity and experimentation, with a "game" element of fishing for emojies in which the user must draw the emoji accuratley enough, or, if the user prefers, simple drawing on the pond surface to create a serene scene.
+The goal was to make something clear and engaging, easy to grasp right away but fun to explore through hovers, toggles, and sound.
 
 ## Functionality
 
 This project has 2 main modes:
 
-1. **Drawing Mode**: Users can draw freely on the pond surface using a brush tool. The drawing experience is designed to be smooth and intuitive, but fairly simple. There is only the hard-coded limited color pallete, singular brush size, and an eraser tool. Once the user is satisfied with their drawing, they can click the "save image" button to finish their session and save their artwork as an image file with the current timestamp as the filename.
+1. **Bars (Default) — “Per-day view”**
 
-2. **Game Mode**: In this mode, users are prompted to "fish" for a specific emoji by drawing it on the pond surface. The target emoji is displayed in the thought bubble of the rightmost mushroom-chibi and users must replicate it as closely as possible using the drawing tools. Once they finish their drawing and click "done", the system evaluates their drawing against the target emoji using a pixel-based comparison method (Dice score) and then decides whether the mushroom-chibis keep or release the caught emoji based on the accuracy of the drawing. Feedback is provided through changes in the facial expressions of the rightmost mushroom-chibi.
+   - Renders one bar per day from steps_daily.csv.
 
-refer to Play-Through-PondSketch.mov for an example usage of both modes.
+   - Draws an 8,000-step goal line across the chart.
+
+   - Hover any bar to see the exact date and step count in a lightweight tooltip.
+
+   - Monthly grid lines and compact y-axis labels keep the scene uncluttered.
+
+2. **Trends + Audio Remix — “Weekday voices”**
+
+   - Toggle Weekday Trends to show seven colored lines, one for each weekday, smoothed across calendar weeks since the first data point.
+
+   - Play Remix (Trends) activates a 7-oscillator sonification (Sun–Sat). Each voice maps steps to a note in a pentatonic scale; higher activity yields higher pitch and slightly stronger amplitude. Each voice has a different waveform for timbral variety (e.g., Mon=triangle, Tue=saw, Wed=square, …). That’s why Monday doesn’t just play a different pitch; it also has a different “color” of sound. During playback we advance a cursor weekIdx = 0 → 1 → 2 → … at a rate set by the Tempo slider (BPM). On each tick, every weekday voice updates to the value of its trend at that week (with interpolation). Also, weeks where a weekday trend is closer to (or above) your goal are louder; weeks far below goal are quieter (but not fully silent thanks to the floor 0.15 so you can still hear the line).
+
+   - Legend click hides/shows individual weekday lines (audio follows visibility), so if you click off "sunday" you won't hear the sunday 'mix' in the audio.
+
+   - Tempo & Volume sliders let you set the pacing (BPM → weeks per beat) and overall loudness.
+     refer to Play-Through-PondSketch.mov for an example usage of both modes.
 
 ## Design Principles
 
-The design focuses on being simple, calm, and a little playful. The color palette uses soft greens and blues to make the pond feel like the center of the scene, while a few brighter accents draw attention to buttons and tools. Everything is arranged to feel balanced without crowding the space. The controls stay minimal and visual so people can figure things out just by trying them. The goal was to make a drawing tool that feels easy to explore rather than something that needs instructions.
+The design focuses on clarity, restraint, and small, meaningful interactions:
 
-Due to the setup of the project, the user is mostly encouraged to make simplistic line drawings, that, in the game mode, capture the essence of the target emoji rather than a more detailed or complex artwork. There is no "bucket" tool or "fill" tool, and the brush size cannot be altered, so the user must rely on line work to suggest shapes and forms. Thus the user is constrained somewhat in their artistic expression, which was an intentional design choice to fit the requirements of this project, and with the added benefit of fitting the calm and simple aesthetic of the overall scene.
+- Skyline metaphor: Bars are neutral and compact; the red goal line provides a stable visual anchor.
 
-Instead of checking what someone draws using perfect vector lines, the project looks at the actual pixels. When a player finishes, both their drawing and the target emoji are turned into small black and white masks and compared using a Dice score to see how closely they match. Working in bitmap space lets the program see the full picture, including messy strokes and softer edges, which makes the evaluation feel more natural and forgiving. It turns a simple technical test into something that feels more like a creative conversation between the player and the system.
+- Minimal annotation: Monthly tick marks and soft grid lines reduce visual noise while preserving orientation.
+
+- Direct manipulation: Hover reveals; toggles and legend clicks control complexity without new screens or dialogs.
+
+- Human-scaled sound: The sonification uses a pentatonic scale across a few octaves to sound musical, not alarming, and ramps smoothly between notes to avoid harsh jumps.
+
+By separating daily detail (bars) from weekly rhythm (trends + audio), the piece balances specific insight (“How many steps on July 14?”) with structural insight (“Do my Tuesdays trend higher?”).
 
 ## Development Process
 
-This was inspired my an air-dry clay project I was doing with a friend last week, in which we tried to make a whimsical jewelry plate integrating frogs and mushrooms.
+The development process involved several stages, starting with data collection and cleaning. First, I thought of what data I would like to analyze, and settled on the data I refer to most often every day: my step count. I exported my health data from my apple watch and formatted it into a CSV file suitable for visualization. Next, I tried to visualize what sort of data visualization would best represent this information. I I experimented with a couple different chart types (such as anomaly detection and line charts) and settled on a skyline-style bar chart for its clarity and aesthetic appeal. I liked the aesthetic of the "skyline" considering I do most of my walking in the city rather than hiking.
 
-**Original inspiration used for the clay project:**
-
-<img src="original_inspo.png" alt="original inspiration" width="300"/>
-
-**Our final air-dry clay project:**
-
-<img src="IMG_2113.png" alt="Air-dry clay project" width="300"/>
-<img src="IMG_2114.png" alt="airdryclay2" width="300"/>
-
-This previous work helped me visualize the kind of setting I wanted this project to have and helped me narrow down the kind of interaction I wanted the user to have. In order to maintain the "scene" I decided to proceed with, there were limited ways in which I could think of the user interacting with it.
-
-Thus, I first spent a considerable amount of time working with p5.js to create the pond scene, including the mushroom-chibis, the pond, and the surrounding environment. I focused on getting the colors and composition right to evoke the calm and whimsical atmosphere I was going for. Initially I struggled with some of the drawing mechanics, particularly with getting rid of specific elements of the outline of the pond and the "shelf" which the mushrooms are sitting on.
-
-Next, I decided to allow the user to only draw on the largest available surface within the image - the pond surface. This was done by creating a mask based on the pond shape and only allowing drawing within that area. I implemented a simple brush tool with a limited color palette to keep the drawing experience straightforward and focused.
-
-I had a vague idea of some way to make this into a drawing game from the very beginning, but once the initial setup was done I was able to iterate on that and expand what I am looking for. Initially, I thought about simply having the user draw a fish, but decided it would then only be a "one and done" experience. Thus, I decided to have the user "fish" for various emojis, which would allow for a more varied and replayable experience. The hardest part in this was figuring out how to evaluate the user's drawing in a way that felt fair and intuitive. After some research, I settled on using a pixel-based comparison method (Dice score) which allowed for a more forgiving evaluation that could account for the imperfections in hand-drawn art.
-
-Finally, I added UI elements to switch between drawing mode and game mode, as well as buttons to save the artwork and submit drawings in game mode. I added this because I was thinking that someone might just want to make simple linework for fun in order to lean more into the "serene" scene.
+Then, I noticed that while I have health data and step count from before May 2023, it was actually before I had my apple watch and was thus inaccruate, so I trimmed it from the data. Then I proceeded to code the bar data and the daily trends at the same time. I wanted to see daily trends (as in the day of the week) because that is data apple health doesn't actually typically provide you with so I wanted to explore that aspect further. For fun I also wanted to see what would happen if I made a "sound track" for the pattern of each day, and spent the rest of my time after I was finished with my visualization doing that.
 
 ## Future Work
 
-There are several areas I wanted to expand the project on. First, I was considering using LLMs to evaluate the shape but decided against it due to time constraints and the added complexity. I also wanted to find a method for it to use any random emoji rather than the hardcoded set I provided. I also wanted to potentially add a scoring mechanism to the game mode to give users more feedback on their performance like how to improve their drawing and what they got deducted points on. Finally, there are some elements of the UI that I am not 100% satisfied with, such as the eraser, no undo button, no brush size, and maybe the design of the buttons, all of which could be improved for a better user experience.
-
-[]
+There are several areas I wanted to expand the project on, but mostly the sound. Right now it's just odd synth music and not really too fun to listen to. I ideally want to come up with a way to make the music more engaging and pleasant.
