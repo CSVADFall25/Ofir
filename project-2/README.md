@@ -24,12 +24,11 @@ This project has 2 main modes:
 
    - Toggle Weekday Trends to show seven colored lines, one for each weekday, smoothed across calendar weeks since the first data point.
 
-   - Play Remix (Trends) activates a 7-oscillator sonification (Sun–Sat). Each voice maps steps to a note in a pentatonic scale; higher activity yields higher pitch and slightly stronger amplitude. Each voice has a different waveform for timbral variety (e.g., Mon=triangle, Tue=saw, Wed=square, …). That’s why Monday doesn’t just play a different pitch; it also has a different “color” of sound. During playback we advance a cursor weekIdx = 0 → 1 → 2 → … at a rate set by the Tempo slider (BPM). On each tick, every weekday voice updates to the value of its trend at that week (with interpolation). Also, weeks where a weekday trend is closer to (or above) your goal are louder; weeks far below goal are quieter (but not fully silent thanks to the floor 0.15 so you can still hear the line).
+   - Play Remix (Trends) activates a 7-oscillator sonification (Sun–Sat). Each voice maps steps to a note in a pentatonic scale; higher activity yields higher pitch and slightly stronger amplitude. Each voice has a different waveform for timbral variety (e.g., Mon=triangle, Tue=saw, Wed=square, …). That’s why Monday doesn’t just play a different pitch; it also has a different “color” of sound. During playback we advance a cursor weekIdx = 0 → 1 → 2 → … at a rate set by the Tempo slider (BPM). On each tick, every weekday voice updates to the value of its trend at that week (with interpolation). Also, weeks where a weekday trend is closer to (or above) the goal are louder; weeks far below goal are quieter (but not fully silent thanks to the floor 0.15 so you can still hear the line).
 
    - Legend click hides/shows individual weekday lines (audio follows visibility), so if you click off "sunday" you won't hear the sunday 'mix' in the audio.
 
-   - Tempo & Volume sliders let you set the pacing (BPM → weeks per beat) and overall loudness.
-     refer to Play-Through-PondSketch.mov for an example usage of both modes.
+   - Tempo & Volume sliders let you set the pacing (BPM → weeks per beat) and overall loudness. The tempo is how quickly the system moves from one week of trend data to the next.
 
 ## Design Principles
 
